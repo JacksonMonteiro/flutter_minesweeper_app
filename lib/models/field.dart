@@ -40,7 +40,7 @@ class Field {
       return;
     }
 
-    if (deltaLine <= 1 && deltaLine <= 1) {
+    if (deltaLine <= 1 && deltaColumn <= 1) {
       neighbors.add(neighbor);
     }
   }
