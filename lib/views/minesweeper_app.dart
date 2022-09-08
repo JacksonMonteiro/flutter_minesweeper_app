@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:minesweeper/components/board_component.dart';
-import 'package:minesweeper/components/field_component.dart';
 import 'package:minesweeper/components/result.dart';
 import 'package:minesweeper/exceptions/explosion_exception.dart';
 import 'package:minesweeper/models/board.dart';
@@ -17,16 +14,12 @@ class MinesweeperApp extends StatefulWidget {
 
 class _MinesweeperAppState extends State<MinesweeperApp> {
   bool? _hasWinned;
-  final Board _board = Board(
-    lines: 12,
-    columns: 12,
-    bombsQnt: 3,
-  );
+  Board? _board;
 
   void _reset() {
     setState(() {
       _hasWinned = null;
-      _board.restart();
+      _board?.restart();
     });
   }
 
@@ -38,12 +31,12 @@ class _MinesweeperAppState extends State<MinesweeperApp> {
     setState(() {
       try {
         field.open();
-        if (_board.isSolved) {
+        if (_board!.isSolved) {
           _hasWinned = true;
         }
       } on ExplosionException {
         _hasWinned = false;
-        _board.revealBombs();
+        _board!.revealBombs();
       }
     });
   }
@@ -55,16 +48,29 @@ class _MinesweeperAppState extends State<MinesweeperApp> {
 
     setState(() {
       field.toggleFlag();
-      if (_board.isSolved) {
+      if (_board!.isSolved) {
         _hasWinned = true;
       }
     });
   }
 
+  Board _getBoard(double width, double height) {
+    if (_board == null) {
+      int columnQnt = 15;
+      double fieldSize = width / columnQnt;
+      int linesQnt = (height / fieldSize).floor();
+      _board = Board(
+        columns: columnQnt,
+        lines: linesQnt,
+        bombsQnt: ((linesQnt + columnQnt) / 2).floor(),
+      );
+    }
+
+    return _board as Board;
+  }
+
   @override
   Widget build(BuildContext context) {
-    Field field = Field(line: 0, column: 0);
-
     return Scaffold(
       appBar: Result(
         hasWin: _hasWinned,
@@ -72,10 +78,13 @@ class _MinesweeperAppState extends State<MinesweeperApp> {
         appBar: AppBar(),
       ),
       body: Container(
-        child: BoardComponent(
-          board: _board,
-          onOpen: _open,
-          onToggleFlag: _toggleFlag,
+        color: Colors.grey,
+        child: LayoutBuilder(
+          builder: (context, constraints) => BoardComponent(
+            board: _getBoard(constraints.maxWidth, constraints.maxHeight),
+            onOpen: _open,
+            onToggleFlag: _toggleFlag,
+          ),
         ),
       ),
     );

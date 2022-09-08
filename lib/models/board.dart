@@ -53,11 +53,15 @@ class Board {
   }
 
   void restart() {
-    _fields.forEach((field) => field.restart());
+    for (var field in _fields) {
+      field.restart();
+    }
     _sortMines();
   }
 
   void revealBombs() {
-    _fields.forEach((field) => field.showBombs());
+    for (var field in _fields) {
+      field.showBombs();
+    }
   }
 }

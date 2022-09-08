@@ -5,7 +5,7 @@ class Result extends StatelessWidget implements PreferredSizeWidget {
   final AppBar appBar;
   final void Function() onReset;
 
-  Result({
+  const Result({
     Key? key,
     required this.hasWin,
     required this.onReset,
