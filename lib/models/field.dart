@@ -21,7 +21,7 @@ class Field {
     return minedAndMarked || secureAndOpened;
   }
 
-  bool get isProximitySafe => neighbors.every((neighbor) => neighbor._isMined);
+  bool get isProximitySafe => neighbors.every((neighbor) => !neighbor._isMined);
 
   int get minesQntd {
     return neighbors.where((neighbor) => neighbor.isMined).length;

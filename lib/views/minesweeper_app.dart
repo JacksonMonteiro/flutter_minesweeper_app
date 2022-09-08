@@ -16,16 +16,49 @@ class MinesweeperApp extends StatefulWidget {
 }
 
 class _MinesweeperAppState extends State<MinesweeperApp> {
+  bool? _hasWinned;
+  final Board _board = Board(
+    lines: 12,
+    columns: 12,
+    bombsQnt: 3,
+  );
+
   void _reset() {
-    print("Has restarted the game");
+    setState(() {
+      _hasWinned = null;
+      _board.restart();
+    });
   }
 
   void _open(Field field) {
-    print("Open...");
+    if (_hasWinned != null) {
+      return;
+    }
+
+    setState(() {
+      try {
+        field.open();
+        if (_board.isSolved) {
+          _hasWinned = true;
+        }
+      } on ExplosionException {
+        _hasWinned = false;
+        _board.revealBombs();
+      }
+    });
   }
 
   void _toggleFlag(Field field) {
-    print("Flag toggled");
+    if (_hasWinned != null) {
+      return;
+    }
+
+    setState(() {
+      field.toggleFlag();
+      if (_board.isSolved) {
+        _hasWinned = true;
+      }
+    });
   }
 
   @override
@@ -34,17 +67,13 @@ class _MinesweeperAppState extends State<MinesweeperApp> {
 
     return Scaffold(
       appBar: Result(
-        hasWin: null,
+        hasWin: _hasWinned,
         onReset: _reset,
         appBar: AppBar(),
       ),
       body: Container(
         child: BoardComponent(
-          board: Board(
-            lines: 9,
-            columns: 9,
-            bombsQnt: 0,
-          ),
+          board: _board,
           onOpen: _open,
           onToggleFlag: _toggleFlag,
         ),
